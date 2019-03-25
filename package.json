@@ -1,0 +1,31 @@
+{
+  "name": "ssb-conn-staging",
+  "description": "Module that manages potential and optional SSB peer connections",
+  "version": "0.0.1",
+  "homepage": "https://github.com/staltz/ssb-conn-staging",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/staltz/ssb-conn-staging.git"
+  },
+  "dependencies": {
+    "multiserver-address": "~1.0.1",
+    "debug": "^4.1.1",
+    "pull-notify": "~0.1.1",
+    "pull-stream": "^3.6.9",
+    "ssb-conn-hub": "~0.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^11.10.4",
+    "tape": "^4.9.2",
+    "typescript": "3.3.x"
+  },
+  "scripts": {
+    "typescript": "tsc",
+    "tape": "set -e; for t in test/*.js; do node $t; done",
+    "test": "npm run typescript && npm run tape"
+  },
+  "author": "Andre Staltz <contact@staltz.com> (http://staltz.com)",
+  "license": "MIT"
+}
