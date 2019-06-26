@@ -10,6 +10,7 @@ class ConnStaging {
   private readonly _hub: ConnHub;
   private readonly _peers: Map<Address, StagedData>;
   private readonly _notifyEvent: any;
+  private _sinkForHubListen: any;
 
   constructor(connHub: ConnHub) {
     this._hub = connHub;
@@ -23,14 +24,14 @@ class ConnStaging {
   private _init() {
     pull(
       this._hub.listen(),
-      pull.drain((ev: HubEvent) => {
+      (this._sinkForHubListen = pull.drain((ev: HubEvent) => {
         if (ev.type === 'connected') {
           this.unstage(ev.address);
         }
         if (ev.type === 'disconnected') {
           // TODO ping this address to see if it's worth re-staging it
         }
-      }),
+      })),
     );
 
     // TODO periodically ping staged peers and unstage those that dont respond
@@ -78,6 +79,13 @@ class ConnStaging {
 
   public listen() {
     return this._notifyEvent.listen();
+  }
+
+  public close() {
+    this._sinkForHubListen.abort(true);
+    this._notifyEvent.end();
+    this._peers.clear();
+    debug('closed the ConnStaging instance');
   }
 
   //#endregion
