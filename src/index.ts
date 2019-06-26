@@ -9,14 +9,16 @@ import {ListenEvent, Address, StagedData} from './types';
 class ConnStaging {
   private readonly _hub: ConnHub;
   private readonly _peers: Map<Address, StagedData>;
-  private readonly _notify: any;
+  private readonly _notifyEvent: any;
 
   constructor(connHub: ConnHub) {
     this._hub = connHub;
     this._peers = new Map<Address, StagedData>();
-    this._notify = Notify();
+    this._notifyEvent = Notify();
     this._init();
   }
+
+  //#region PRIVATE
 
   private _init() {
     pull(
@@ -37,34 +39,36 @@ class ConnStaging {
     // But then we need to load all the custom multiserver plugins too
   }
 
-  ///////////////
-  //// PUBLIC API
-  ///////////////
-
-  public stage(address: Address, data: StagedData): boolean {
+  private _assertValidAddress(address: Address) {
     if (!msAddress.check(address)) {
       throw new Error('The given address is not a valid multiserver-address');
     }
+  }
+
+  //#endregion
+
+  //#region PUBLIC API
+
+  public stage(address: Address, data: StagedData): boolean {
+    this._assertValidAddress(address);
 
     if (!!this._hub.getState(address)) return false;
     if (this._peers.has(address)) return false;
 
     this._peers.set(address, data);
     debug('staged peer %s', address);
-    this._notify({type: 'staged', address} as ListenEvent);
+    this._notifyEvent({type: 'staged', address} as ListenEvent);
     return true;
   }
 
   public unstage(address: Address): boolean {
-    if (!msAddress.check(address)) {
-      throw new Error('The given address is not a valid multiserver-address');
-    }
+    this._assertValidAddress(address);
 
     if (!this._peers.has(address)) return false;
 
     this._peers.delete(address);
     debug('unstaged peer %s', address);
-    this._notify({type: 'unstaged', address} as ListenEvent);
+    this._notifyEvent({type: 'unstaged', address} as ListenEvent);
     return true;
   }
 
@@ -73,8 +77,10 @@ class ConnStaging {
   }
 
   public listen() {
-    return this._notify.listen();
+    return this._notifyEvent.listen();
   }
+
+  //#endregion
 }
 
 export = ConnStaging;
