@@ -1,4 +1,5 @@
 const pull = require('pull-stream');
+const cat = require('pull-cat');
 const Notify = require('pull-notify');
 const msAddress = require('multiserver-address');
 const debug = require('debug')('ssb:conn-staging');
@@ -10,12 +11,14 @@ class ConnStaging {
   private readonly _hub: ConnHub;
   private readonly _peers: Map<Address, StagedData>;
   private readonly _notifyEvent: any;
+  private readonly _notifyEntries: any;
   private _sinkForHubListen: any;
 
   constructor(connHub: ConnHub) {
     this._hub = connHub;
     this._peers = new Map<Address, StagedData>();
     this._notifyEvent = Notify();
+    this._notifyEntries = Notify();
     this._init();
   }
 
@@ -46,6 +49,10 @@ class ConnStaging {
     }
   }
 
+  private _updateLiveEntries() {
+    this._notifyEntries(Array.from(this._peers.entries()));
+  }
+
   //#endregion
 
   //#region PUBLIC API
@@ -59,6 +66,7 @@ class ConnStaging {
     this._peers.set(address, data);
     debug('staged peer %s', address);
     this._notifyEvent({type: 'staged', address} as ListenEvent);
+    this._updateLiveEntries();
     return true;
   }
 
@@ -70,11 +78,19 @@ class ConnStaging {
     this._peers.delete(address);
     debug('unstaged peer %s', address);
     this._notifyEvent({type: 'unstaged', address} as ListenEvent);
+    this._updateLiveEntries();
     return true;
   }
 
   public entries() {
     return this._peers.entries();
+  }
+
+  public liveEntries() {
+    return cat([
+      pull.values([Array.from(this._peers.entries())]),
+      this._notifyEntries.listen(),
+    ]);
   }
 
   public listen() {

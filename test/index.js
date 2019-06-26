@@ -32,6 +32,44 @@ tape('stage(), entries(), unstage(), entries()', t => {
   t.end();
 });
 
+tape('liveEntries() emits all entries as they update', t => {
+  const connHub = {
+    listen: () => pull.empty(),
+    getState: () => undefined,
+  };
+
+  const connStaging = new ConnStaging(connHub);
+
+  let i = 0;
+  pull(
+    connStaging.liveEntries(),
+    pull.drain(entries => {
+      ++i;
+      if (i === 1) {
+        t.pass('FIRST EMISSION');
+        t.equals(entries.length, 0, 'entries === []');
+      } else if (i === 2) {
+        t.pass('SECOND EMISSION');
+        t.equals(entries.length, 1, 'there is one entry');
+        const entry = entries[0];
+        t.equals(entry[0], TEST_ADDR, 'left is the address');
+        t.equals(typeof entry[1], 'object', 'right is the data');
+        t.equals(entry[1].mode, 'internet', 'mode === internet');
+      } else if (i === 3) {
+        t.pass('THIRD EMISSION');
+        t.equals(entries.length, 0, 'entries === []');
+        t.end();
+      } else {
+        t.fail('listen() should not emit further events');
+      }
+    }),
+  );
+
+  const address = TEST_ADDR;
+  connStaging.stage(address, {mode: 'internet', address});
+  connStaging.unstage(address);
+});
+
 tape('refuses to stage an already connected peer', t => {
   const connHub = {
     listen: () => pull.empty(),
