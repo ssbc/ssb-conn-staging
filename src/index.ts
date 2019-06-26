@@ -13,10 +13,12 @@ class ConnStaging {
   private readonly _notifyEvent: any;
   private readonly _notifyEntries: any;
   private _sinkForHubListen: any;
+  private _closed: boolean;
 
   constructor(connHub: ConnHub) {
     this._hub = connHub;
     this._peers = new Map<Address, StagedData>();
+    this._closed = false;
     this._notifyEvent = Notify();
     this._notifyEntries = Notify();
     this._init();
@@ -43,6 +45,12 @@ class ConnStaging {
     // But then we need to load all the custom multiserver plugins too
   }
 
+  private _assertNotClosed() {
+    if (this._closed) {
+      throw new Error('This ConnStaging instance is closed, create a new one.');
+    }
+  }
+
   private _assertValidAddress(address: Address) {
     if (!msAddress.check(address)) {
       throw new Error('The given address is not a valid multiserver-address');
@@ -58,6 +66,7 @@ class ConnStaging {
   //#region PUBLIC API
 
   public stage(address: Address, data: StagedData): boolean {
+    this._assertNotClosed();
     this._assertValidAddress(address);
 
     if (!!this._hub.getState(address)) return false;
@@ -71,6 +80,7 @@ class ConnStaging {
   }
 
   public unstage(address: Address): boolean {
+    this._assertNotClosed();
     this._assertValidAddress(address);
 
     if (!this._peers.has(address)) return false;
@@ -83,10 +93,14 @@ class ConnStaging {
   }
 
   public entries() {
+    this._assertNotClosed();
+
     return this._peers.entries();
   }
 
   public liveEntries() {
+    this._assertNotClosed();
+
     return cat([
       pull.values([Array.from(this._peers.entries())]),
       this._notifyEntries.listen(),
@@ -94,10 +108,13 @@ class ConnStaging {
   }
 
   public listen() {
+    this._assertNotClosed();
+
     return this._notifyEvent.listen();
   }
 
   public close() {
+    this._closed = true;
     this._sinkForHubListen.abort(true);
     this._notifyEvent.end();
     this._peers.clear();
