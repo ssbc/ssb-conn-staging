@@ -9,6 +9,6 @@ export type StagedData = Readonly<{
   address: Address;
   key?: string;
   host?: string;
-  mode: 'bt' | 'lan' | 'internet';
+  type: 'bt' | 'lan' | 'internet';
   [misc: string]: any;
 }>;
