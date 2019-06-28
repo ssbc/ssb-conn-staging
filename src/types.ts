@@ -6,9 +6,7 @@ export type ListenEvent = Readonly<{
 }>;
 
 export type StagedData = Readonly<{
-  address: Address;
   key?: string;
-  host?: string;
-  type: 'bt' | 'lan' | 'internet';
+  type?: 'bt' | 'lan' | 'internet';
   [misc: string]: any;
 }>;
