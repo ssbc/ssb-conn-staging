@@ -30,7 +30,7 @@ class ConnStaging {
     pull(
       this._hub.listen(),
       (this._sinkForHubListen = pull.drain((ev: HubEvent) => {
-        if (ev.type === 'connected') {
+        if (ev.type === 'connected' || ev.type === 'connecting') {
           this.unstage(ev.address);
         }
         if (ev.type === 'disconnected') {
