@@ -65,18 +65,29 @@ class ConnStaging {
 
   //#region PUBLIC API
 
-  public stage(address: Address, data: StagedData): boolean {
+  public stage(address: Address, data: Partial<StagedData>): boolean {
     this._assertNotClosed();
     this._assertValidAddress(address);
 
     if (!!this._hub.getState(address)) return false;
-    if (this._peers.has(address)) return false;
 
-    this._peers.set(address, data);
-    debug('staged peer %s', address);
-    this._notifyEvent({type: 'staged', address} as ListenEvent);
-    this._updateLiveEntries();
-    return true;
+    const now = Date.now();
+    if (this._peers.has(address)) {
+      const previous = this._peers.get(address)!;
+      this._peers.set(address, {...previous, stagingUpdated: now, ...data});
+      this._updateLiveEntries();
+      return false;
+    } else {
+      this._peers.set(address, {
+        stagingBirth: now,
+        stagingUpdated: now,
+        ...data,
+      });
+      debug('staged peer %s', address);
+      this._notifyEvent({type: 'staged', address} as ListenEvent);
+      this._updateLiveEntries();
+      return true;
+    }
   }
 
   public unstage(address: Address): boolean {

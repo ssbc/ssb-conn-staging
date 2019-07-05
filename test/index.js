@@ -55,6 +55,7 @@ tape('liveEntries() emits all entries as they update', t => {
         t.equals(entry[0], TEST_ADDR, 'left is the address');
         t.equals(typeof entry[1], 'object', 'right is the data');
         t.equals(entry[1].mode, 'internet', 'mode === internet');
+        t.true(entry[1].stagingBirth > 1000, 'there exists stagingBirth');
       } else if (i === 3) {
         t.pass('THIRD EMISSION');
         t.equals(entries.length, 0, 'entries === []');
