@@ -1,6 +1,6 @@
 # ssb-conn-staging
 
-Module that manages potential and optional peer connections. For use with the SSB CONN family of modules. See also [ssb-conn-hub](https://github.com/staltz/ssb-conn-hub).
+Module that manages potential and optional peer connections. For use with the [SSB CONN](https://github.com/staltz/ssb-conn) family of modules.
 
 *Visual metaphor: a bench with substitute players, idle and not actively in the game, optionally available and waiting for further instructions to join or not.*
 
