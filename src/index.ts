@@ -3,47 +3,23 @@ const cat = require('pull-cat');
 const Notify = require('pull-notify');
 const msAddress = require('multiserver-address');
 const debug = require('debug')('ssb:conn-staging');
-import ConnHub = require('ssb-conn-hub');
-import {ListenEvent as HubEvent} from 'ssb-conn-hub/lib/types';
 import {ListenEvent, Address, StagedData} from './types';
 
 class ConnStaging {
-  private readonly _hub: ConnHub;
   private readonly _peers: Map<Address, StagedData>;
   private readonly _notifyEvent: any;
   private readonly _notifyEntries: any;
   private _sinkForHubListen: any;
   private _closed: boolean;
 
-  constructor(connHub: ConnHub) {
-    this._hub = connHub;
+  constructor() {
     this._peers = new Map<Address, StagedData>();
     this._closed = false;
     this._notifyEvent = Notify();
     this._notifyEntries = Notify();
-    this._init();
   }
 
   //#region PRIVATE
-
-  private _init() {
-    pull(
-      this._hub.listen(),
-      (this._sinkForHubListen = pull.drain((ev: HubEvent) => {
-        if (ev.type === 'connected' || ev.type === 'connecting') {
-          this.unstage(ev.address);
-        }
-        if (ev.type === 'disconnected') {
-          // TODO ping this address to see if it's worth re-staging it
-        }
-      })),
-    );
-
-    // TODO periodically ping staged peers and unstage those that dont respond
-    // How should we do this without issuing an ssb-server::connect() ?
-    // Perhaps creating a new multiserver client?
-    // But then we need to load all the custom multiserver plugins too
-  }
 
   private _assertNotClosed() {
     if (this._closed) {
@@ -68,8 +44,6 @@ class ConnStaging {
   public stage(address: Address, data: Partial<StagedData>): boolean {
     this._assertNotClosed();
     this._assertValidAddress(address);
-
-    if (!!this._hub.getState(address)) return false;
 
     const now = Date.now();
     if (this._peers.has(address)) {

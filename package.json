@@ -14,8 +14,7 @@
     "debug": "^4.1.1",
     "pull-cat": "~1.1.11",
     "pull-notify": "~0.1.1",
-    "pull-stream": "^3.6.9",
-    "ssb-conn-hub": "~0.0.3"
+    "pull-stream": "^3.6.9"
   },
   "devDependencies": {
     "@types/node": "^11.10.4",
