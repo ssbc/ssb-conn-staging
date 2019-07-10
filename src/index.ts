@@ -9,7 +9,6 @@ class ConnStaging {
   private readonly _peers: Map<Address, StagedData>;
   private readonly _notifyEvent: any;
   private readonly _notifyEntries: any;
-  private _sinkForHubListen: any;
   private _closed: boolean;
 
   constructor() {
@@ -100,7 +99,6 @@ class ConnStaging {
 
   public close() {
     this._closed = true;
-    this._sinkForHubListen.abort(true);
     this._notifyEvent.end();
     this._peers.clear();
     debug('closed the ConnStaging instance');
