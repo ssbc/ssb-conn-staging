@@ -7,7 +7,6 @@ export type ListenEvent = Readonly<{
 
 export type StagedData = Readonly<{
   key?: string;
-  type?: 'bt' | 'lan' | 'internet';
   stagingBirth: number;
   stagingUpdated: number;
   [misc: string]: any;
