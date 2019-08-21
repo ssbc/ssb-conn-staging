@@ -1,7 +1,7 @@
 {
   "name": "ssb-conn-staging",
   "description": "Module that manages potential and optional SSB peer connections",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "homepage": "https://github.com/staltz/ssb-conn-staging",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
