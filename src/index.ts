@@ -76,6 +76,13 @@ class ConnStaging {
     return true;
   }
 
+  public get(address: Address): StagedData | undefined {
+    this._assertNotClosed();
+    this._assertValidAddress(address);
+
+    return this._peers.get(address);
+  }
+
   public entries() {
     this._assertNotClosed();
 

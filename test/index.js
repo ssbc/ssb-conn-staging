@@ -26,6 +26,20 @@ tape('stage(), entries(), unstage(), entries()', t => {
   t.end();
 });
 
+tape('stage(), get()', t => {
+  const connStaging = new ConnStaging();
+
+  const address = TEST_ADDR;
+  const result1 = connStaging.stage(address, {mode: 'internet', address});
+  t.equals(result1, true, 'stage() succeeds');
+
+  const result2 = connStaging.get(address);
+  t.ok(result2, 'there is a result from get()');
+  t.equals(result2.mode, 'internet');
+
+  t.end();
+});
+
 tape('liveEntries() emits all entries as they update', t => {
   const connStaging = new ConnStaging();
 
