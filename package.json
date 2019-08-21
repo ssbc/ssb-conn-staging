@@ -10,8 +10,8 @@
     "url": "git://github.com/staltz/ssb-conn-staging.git"
   },
   "dependencies": {
-    "multiserver-address": "~1.0.1",
     "debug": "^4.1.1",
+    "multiserver-address": "~1.0.1",
     "pull-cat": "~1.1.11",
     "pull-notify": "~0.1.1",
     "pull-stream": "^3.6.9"
