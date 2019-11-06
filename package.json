@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/node": "^11.10.4",
     "tape": "^4.9.2",
-    "typescript": "3.3.x"
+    "typescript": "3.7.x"
   },
   "scripts": {
     "typescript": "tsc",
